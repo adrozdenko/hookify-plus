@@ -5,8 +5,8 @@ event: stop
 action: block
 conditions:
   - field: transcript
-    operator: not_contains
-    pattern: npm test|pytest|cargo test
+    operator: not_regex_match
+    pattern: (npm test|pytest|cargo test|vitest|jest)
 ---
 
 **Tests not detected in transcript!**

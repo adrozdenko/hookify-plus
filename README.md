@@ -17,6 +17,8 @@ The upstream hookify plugin has several limitations and bugs. This fork includes
 | Write tool `new_text` field | Bug | Fixed |
 | Python 3.8 compatibility | Bug | Fixed |
 | Claude sees blocking reasons | Bug | Fixed |
+| Windows paths with spaces | Bug | Fixed |
+| Broken example file | Bug | Fixed |
 
 ## Installation
 
@@ -125,6 +127,8 @@ These features have been submitted to upstream (pending review):
 | [#16081](https://github.com/anthropics/claude-code/pull/16081) | Write tool fix + Update tool | Open |
 | [#14588](https://github.com/anthropics/claude-code/issues/14588) | Python 3.8 compatibility | Bug |
 | [#12446](https://github.com/anthropics/claude-code/issues/12446) | Claude sees blocking reasons | Bug |
+| [#16152](https://github.com/anthropics/claude-code/issues/16152) | Windows paths with spaces | Bug |
+| [#13464](https://github.com/anthropics/claude-code/issues/13464) | Broken example file | Bug |
 
 All integrated into hookify-plus. No waiting for upstream approval.
 
