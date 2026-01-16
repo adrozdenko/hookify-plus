@@ -4,8 +4,36 @@
 [![Based on](https://img.shields.io/badge/based%20on-hookify%200.1.0-gray)](https://github.com/anthropics/claude-code/tree/main/plugins/hookify)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-> Community-maintained fork of the hookify plugin for Claude Code.
-> **11 improvements** over upstream. No waiting for Anthropic to merge PRs.
+**Community-maintained fork of the hookify plugin for Claude Code.**
+
+The upstream hookify plugin has bugs and missing features that Anthropic hasn't addressed. This fork integrates community fixes so you don't have to wait.
+
+## What You Get
+
+### 5 Features Added
+
+| Feature | What it does |
+|---------|--------------|
+| `not_regex_match` | Exclude patterns (e.g., skip test files from rules) |
+| `value` key | Clearer syntax for non-regex operators |
+| `read` event | Separate event for Read/Glob/Grep/LS (no false triggers) |
+| Global rules | Rules in `~/.claude/` apply to ALL projects |
+| `Update` tool | File events now fire for the Update tool |
+
+### 6 Bugs Fixed
+
+| Bug | Issue |
+|-----|-------|
+| Read tools incorrectly fired `file` rules | [#14588](https://github.com/anthropics/claude-code/issues/14588) |
+| Write tool `new_text` field was broken | [#16081](https://github.com/anthropics/claude-code/pull/16081) |
+| Python 3.8 type hints incompatible | [#14588](https://github.com/anthropics/claude-code/issues/14588) |
+| Claude couldn't see why rules blocked | [#12446](https://github.com/anthropics/claude-code/issues/12446) |
+| Windows paths with spaces failed | [#16152](https://github.com/anthropics/claude-code/issues/16152) |
+| Example file used wrong operator | [#13464](https://github.com/anthropics/claude-code/issues/13464) |
+
+**11 total improvements.** No waiting for Anthropic to merge PRs.
+
+---
 
 ## Quick Start
 
@@ -32,30 +60,7 @@ EOF
 # Done! Rules are active immediately.
 ```
 
-## Why Hookify Plus?
-
-Upstream hookify has bugs and missing features. This fork integrates community fixes:
-
-### Features Added
-
-| Feature | Description |
-|---------|-------------|
-| `not_regex_match` | Exclude patterns (e.g., skip test files) |
-| `value` key | Alias for `pattern`, clearer for non-regex operators |
-| `read` event | Separate event for Read/Glob/Grep/LS tools |
-| Global rules | Rules in `~/.claude/` apply to ALL projects |
-| `Update` tool | File event fires for Update tool |
-
-### Bugs Fixed
-
-| Bug | Issue |
-|-----|-------|
-| Read tools fired `file` rules | [#14588](https://github.com/anthropics/claude-code/issues/14588) |
-| Write tool `new_text` field broken | [#16081](https://github.com/anthropics/claude-code/pull/16081) |
-| Python 3.8 incompatible | [#14588](https://github.com/anthropics/claude-code/issues/14588) |
-| Claude couldn't see block reasons | [#12446](https://github.com/anthropics/claude-code/issues/12446) |
-| Windows paths with spaces | [#16152](https://github.com/anthropics/claude-code/issues/16152) |
-| Example used wrong operator | [#13464](https://github.com/anthropics/claude-code/issues/13464) |
+---
 
 ## Rule Syntax
 
@@ -74,7 +79,7 @@ Message shown to Claude when rule triggers.
 Supports **markdown** formatting.
 ```
 
-### Advanced: Multiple Conditions
+### Multiple Conditions
 
 ```yaml
 ---
@@ -117,7 +122,7 @@ You're editing a .env file. Make sure it's in .gitignore!
 | `starts_with` | Prefix match |
 | `ends_with` | Suffix match |
 
-### Fields
+### Fields by Event
 
 | Event | Available Fields |
 |-------|------------------|
@@ -127,18 +132,18 @@ You're editing a .env file. Make sure it's in .gitignore!
 | `stop` | `reason`, `transcript` |
 | `prompt` | `user_prompt` |
 
-## Rule Locations
+### Rule Locations
 
 | Location | Scope |
 |----------|-------|
 | `.claude/hookify.*.local.md` | Current project only |
 | `~/.claude/hookify.*.local.md` | All projects (global) |
 
-Both locations are loaded and evaluated together.
+---
 
 ## Installation
 
-### Install (Symlink)
+### Install
 
 ```bash
 git clone https://github.com/adrozdenko/hookify-plus ~/hookify-plus
@@ -166,16 +171,20 @@ mv ~/.claude/plugins/cache/claude-code-plugins/hookify/0.1.0.bak \
    ~/.claude/plugins/cache/claude-code-plugins/hookify/0.1.0
 ```
 
+---
+
 ## Versioning
 
-Version format: `0.1.0-plus.N`
+Format: `0.1.0-plus.N`
 
-- `0.1.0` = upstream hookify version this fork is based on
-- `plus.N` = hookify-plus patch number
+- `0.1.0` = upstream hookify version
+- `plus.N` = patch number
 
-When upstream releases a new version, we rebase and reset the patch number (e.g., `0.2.0-plus.1`).
+When upstream releases a new version, we rebase (e.g., `0.2.0-plus.1`).
 
-See [CHANGELOG.md](CHANGELOG.md) for full version history.
+See [CHANGELOG.md](CHANGELOG.md) for full history.
+
+---
 
 ## Credits
 
