@@ -50,7 +50,7 @@ def main():
         event = None
         if tool_name == 'Bash':
             event = 'bash'
-        elif tool_name in ['Edit', 'Write', 'MultiEdit']:
+        elif tool_name in ['Edit', 'Write', 'MultiEdit', 'Update']:
             event = 'file'
         elif tool_name in ['Read', 'Glob', 'Grep', 'LS']:
             event = 'read'  # Read operations get their own event type

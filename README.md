@@ -12,6 +12,9 @@ The upstream hookify plugin has several limitations and bugs. This fork includes
 | `value` key in conditions | Missing | Included |
 | `read` event type | Missing | Included |
 | Read tools trigger file rules | Bug | Fixed |
+| Global rules in `~/.claude/` | Missing | Included |
+| `Update` tool support | Missing | Included |
+| Write tool `new_text` field | Bug | Fixed |
 
 ## Installation
 
@@ -74,10 +77,25 @@ event: read  # Only triggers on file reads, not edits
 
 This prevents file-editing rules from incorrectly firing when reading files.
 
+### 4. Global Rules
+
+Rules in `~/.claude/` apply to ALL projects:
+
+```bash
+# Create a global rule
+~/.claude/hookify.my-global-rule.local.md
+```
+
+Project-level rules (`.claude/`) take precedence and combine with global rules.
+
+### 5. Update Tool Support
+
+The `Update` tool is now recognized as a file event, matching `Edit`, `Write`, and `MultiEdit`.
+
 ## Event Types
 
 - `bash` - Bash commands
-- `file` - File edits (Edit, Write, MultiEdit)
+- `file` - File edits (Edit, Write, MultiEdit, Update)
 - `read` - File reads (Read, Glob, Grep, LS)
 - `stop` - Completion checks
 - `prompt` - User input
@@ -95,9 +113,16 @@ This prevents file-editing rules from incorrectly firing when reading files.
 
 ## Upstream PRs
 
-These features have been submitted to upstream:
-- [#18419](https://github.com/anthropics/claude-code/pull/18419) - `not_regex_match` + `value` key
-- [#18438](https://github.com/anthropics/claude-code/pull/18438) - `read` event type
+These features have been submitted to upstream (pending review):
+
+| PR | Feature | Status |
+|----|---------|--------|
+| [#18419](https://github.com/anthropics/claude-code/pull/18419) | `not_regex_match` + `value` key | Open |
+| [#18438](https://github.com/anthropics/claude-code/pull/18438) | `read` event type | Open |
+| [#13916](https://github.com/anthropics/claude-code/pull/13916) | Global rules in `~/.claude/` | Open |
+| [#16081](https://github.com/anthropics/claude-code/pull/16081) | Write tool fix + Update tool | Open |
+
+All integrated into hookify-plus. No waiting for upstream approval.
 
 ## License
 
