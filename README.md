@@ -1,5 +1,8 @@
 # Hookify Plus
 
+[![Version](https://img.shields.io/badge/version-0.1.0--plus.3-blue)](CHANGELOG.md)
+[![Based on](https://img.shields.io/badge/based%20on-hookify%200.1.0-gray)](https://github.com/anthropics/claude-code/tree/main/plugins/hookify)
+
 Enhanced hookify plugin for Claude Code with community fixes and features.
 
 ## Quick Start
@@ -156,6 +159,18 @@ Fixes integrated from community PRs and issues:
 | [@kp222x](https://github.com/kp222x) | Global rules ([#13916](https://github.com/anthropics/claude-code/pull/13916)) |
 | [@heathdutton](https://github.com/heathdutton) | Write fix + Update tool ([#16081](https://github.com/anthropics/claude-code/pull/16081)) |
 | Issue reporters | [#14588](https://github.com/anthropics/claude-code/issues/14588), [#12446](https://github.com/anthropics/claude-code/issues/12446), [#16152](https://github.com/anthropics/claude-code/issues/16152), [#13464](https://github.com/anthropics/claude-code/issues/13464) |
+
+## Updating
+
+```bash
+cd ~/hookify-plus && git pull
+```
+
+Changes take effect immediately—no restart needed.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## License
 
