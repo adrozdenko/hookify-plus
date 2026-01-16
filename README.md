@@ -1,46 +1,72 @@
 # Hookify Plus
 
-Enhanced version of the hookify plugin with additional features and bug fixes.
+Enhanced hookify plugin for Claude Code with community fixes and features.
+
+## Quick Start
+
+```bash
+# 1. Clone
+git clone https://github.com/adrozdenko/hookify-plus ~/hookify-plus
+
+# 2. Backup & link (recommended)
+mv ~/.claude/plugins/cache/claude-code-plugins/hookify/0.1.0{,.bak}
+ln -s ~/hookify-plus ~/.claude/plugins/cache/claude-code-plugins/hookify/0.1.0
+
+# 3. Create a rule
+cat > .claude/hookify.warn-rm.local.md << 'EOF'
+---
+name: warn-dangerous-rm
+enabled: true
+event: bash
+pattern: rm\s+-rf
+---
+⚠️ **Dangerous rm command!** Double-check the path before proceeding.
+EOF
+
+# Done! The rule is active immediately.
+```
 
 ## Why Hookify Plus?
 
-The upstream hookify plugin has several limitations and bugs. This fork includes fixes that are pending review in the official repo:
+The upstream hookify plugin has bugs and missing features. This fork integrates community fixes:
 
-| Feature | Upstream | Hookify Plus |
-|---------|----------|--------------|
-| `not_regex_match` operator | Missing | Included |
-| `value` key in conditions | Missing | Included |
-| `read` event type | Missing | Included |
-| Read tools trigger file rules | Bug | Fixed |
-| Global rules in `~/.claude/` | Missing | Included |
-| `Update` tool support | Missing | Included |
-| Write tool `new_text` field | Bug | Fixed |
-| Python 3.8 compatibility | Bug | Fixed |
-| Claude sees blocking reasons | Bug | Fixed |
-| Windows paths with spaces | Bug | Fixed |
-| Broken example file | Bug | Fixed |
+| Issue | Upstream | Hookify Plus |
+|-------|----------|--------------|
+| `not_regex_match` operator | ❌ Missing | ✅ Added |
+| `value` key in conditions | ❌ Missing | ✅ Added |
+| `read` event type | ❌ Missing | ✅ Added |
+| Global rules (`~/.claude/`) | ❌ Missing | ✅ Added |
+| `Update` tool support | ❌ Missing | ✅ Added |
+| Read tools fire file rules | 🐛 Bug | ✅ Fixed |
+| Write tool `new_text` field | 🐛 Bug | ✅ Fixed |
+| Python 3.8 type hints | 🐛 Bug | ✅ Fixed |
+| Claude can't see block reasons | 🐛 Bug | ✅ Fixed |
+| Windows paths with spaces | 🐛 Bug | ✅ Fixed |
+| Example uses wrong operator | 🐛 Bug | ✅ Fixed |
+
+**11 improvements** over upstream. No waiting for Anthropic to merge PRs.
 
 ## Installation
 
-### Option 1: Local Plugin Directory
+### Recommended: Symlink (works everywhere)
 
 ```bash
-# Clone or copy hookify-plus to your preferred location
-git clone https://github.com/adrozdenko/hookify-plus ~/plugins/hookify-plus
+# Clone to home directory
+git clone https://github.com/adrozdenko/hookify-plus ~/hookify-plus
 
-# Use with Claude Code
-claude --plugin-dir ~/plugins/hookify-plus
-```
-
-### Option 2: Replace Installed Hookify
-
-```bash
-# Backup original
+# Backup original and create symlink
 mv ~/.claude/plugins/cache/claude-code-plugins/hookify/0.1.0 \
    ~/.claude/plugins/cache/claude-code-plugins/hookify/0.1.0.bak
 
-# Link hookify-plus
-ln -s /path/to/hookify-plus \
+ln -s ~/hookify-plus \
+   ~/.claude/plugins/cache/claude-code-plugins/hookify/0.1.0
+```
+
+### To Revert
+
+```bash
+rm ~/.claude/plugins/cache/claude-code-plugins/hookify/0.1.0
+mv ~/.claude/plugins/cache/claude-code-plugins/hookify/0.1.0.bak \
    ~/.claude/plugins/cache/claude-code-plugins/hookify/0.1.0
 ```
 
@@ -56,81 +82,80 @@ conditions:
     operator: regex_match
     pattern: \.tsx$
   - field: file_path
-    operator: not_regex_match  # NEW!
+    operator: not_regex_match  # Exclude test/story files
     pattern: (\.test\.|\.stories\.)
 ```
 
 ### 2. `value` Key Support
 
-Use `value` instead of `pattern` for non-regex operators (clearer intent):
+Use `value` instead of `pattern` for non-regex operators:
 
 ```yaml
 conditions:
   - field: command
     operator: contains
-    value: --force  # More intuitive than "pattern"
+    value: --force  # Clearer than "pattern" for substring match
 ```
 
 ### 3. `read` Event Type
 
-Read operations (Read, Glob, Grep, LS) now have their own event type:
+Read operations have their own event type (no more false triggers):
 
 ```yaml
-event: read  # Only triggers on file reads, not edits
+event: read  # Only fires on Read, Glob, Grep, LS
 ```
-
-This prevents file-editing rules from incorrectly firing when reading files.
 
 ### 4. Global Rules
 
 Rules in `~/.claude/` apply to ALL projects:
 
 ```bash
-# Create a global rule
-~/.claude/hookify.my-global-rule.local.md
+~/.claude/hookify.no-console-log.local.md  # Works in every project
 ```
 
-Project-level rules (`.claude/`) take precedence and combine with global rules.
+Both global and project rules are loaded and evaluated together.
 
-### 5. Update Tool Support
+### 5. Claude Sees Block Reasons
 
-The `Update` tool is now recognized as a file event, matching `Edit`, `Write`, and `MultiEdit`.
+When a rule blocks, Claude now receives the full message explaining why:
+
+```yaml
+action: block  # Claude sees your message and can correct itself
+```
 
 ## Event Types
 
-- `bash` - Bash commands
-- `file` - File edits (Edit, Write, MultiEdit, Update)
-- `read` - File reads (Read, Glob, Grep, LS)
-- `stop` - Completion checks
-- `prompt` - User input
-- `all` - All events
+| Event | Tools |
+|-------|-------|
+| `bash` | Bash |
+| `file` | Edit, Write, MultiEdit, Update |
+| `read` | Read, Glob, Grep, LS |
+| `stop` | Stop (completion check) |
+| `prompt` | UserPromptSubmit |
+| `all` | All of the above |
 
 ## Operators
 
-- `regex_match` - Pattern must match (regex)
-- `not_regex_match` - Pattern must NOT match (regex)
-- `contains` - String must contain value
-- `not_contains` - String must NOT contain value
-- `equals` - Exact string match
-- `starts_with` - String starts with value
-- `ends_with` - String ends with value
+| Operator | Description |
+|----------|-------------|
+| `regex_match` | Pattern matches (regex) |
+| `not_regex_match` | Pattern does NOT match (regex) |
+| `contains` | Substring present |
+| `not_contains` | Substring NOT present |
+| `equals` | Exact match |
+| `starts_with` | Starts with value |
+| `ends_with` | Ends with value |
 
-## Upstream PRs
+## Credits
 
-These features have been submitted to upstream (pending review):
+Fixes integrated from community PRs and issues:
 
-| PR/Issue | Feature | Status |
-|----------|---------|--------|
-| [#18419](https://github.com/anthropics/claude-code/pull/18419) | `not_regex_match` + `value` key | Open |
-| [#18438](https://github.com/anthropics/claude-code/pull/18438) | `read` event type | Open |
-| [#13916](https://github.com/anthropics/claude-code/pull/13916) | Global rules in `~/.claude/` | Open |
-| [#16081](https://github.com/anthropics/claude-code/pull/16081) | Write tool fix + Update tool | Open |
-| [#14588](https://github.com/anthropics/claude-code/issues/14588) | Python 3.8 compatibility | Bug |
-| [#12446](https://github.com/anthropics/claude-code/issues/12446) | Claude sees blocking reasons | Bug |
-| [#16152](https://github.com/anthropics/claude-code/issues/16152) | Windows paths with spaces | Bug |
-| [#13464](https://github.com/anthropics/claude-code/issues/13464) | Broken example file | Bug |
-
-All integrated into hookify-plus. No waiting for upstream approval.
+| Contributor | Contribution |
+|-------------|--------------|
+| [@adrozdenko](https://github.com/adrozdenko) | `not_regex_match`, `value` key, `read` event |
+| [@kp222x](https://github.com/kp222x) | Global rules ([#13916](https://github.com/anthropics/claude-code/pull/13916)) |
+| [@heathdutton](https://github.com/heathdutton) | Write fix + Update tool ([#16081](https://github.com/anthropics/claude-code/pull/16081)) |
+| Issue reporters | [#14588](https://github.com/anthropics/claude-code/issues/14588), [#12446](https://github.com/anthropics/claude-code/issues/12446), [#16152](https://github.com/anthropics/claude-code/issues/16152), [#13464](https://github.com/anthropics/claude-code/issues/13464) |
 
 ## License
 
