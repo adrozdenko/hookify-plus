@@ -89,12 +89,13 @@ You're adding an API key to a .env file. Ensure this file is in .gitignore!
   - For file: `file_path`, `new_text`, `old_text`, `content`
 - `operator`: How to match
   - `regex_match`: Regex pattern matching
+  - `not_regex_match`: Pattern must NOT match (regex) ✨ *hookify-plus*
   - `contains`: Substring check
   - `equals`: Exact match
   - `not_contains`: Substring must NOT be present
   - `starts_with`: Prefix check
   - `ends_with`: Suffix check
-- `pattern`: Pattern or string to match
+- `pattern` or `value`: Pattern or string to match (use `value` for non-regex operators) ✨ *hookify-plus*
 
 **All conditions must match for rule to trigger.**
 
@@ -283,8 +284,11 @@ Better: `rm\s+-rf`
 
 ## File Organization
 
-**Location:** All rules in `.claude/` directory
-**Naming:** `.claude/hookify.{descriptive-name}.local.md`
+**Locations:** ✨ *hookify-plus supports both*
+- **Project rules:** `.claude/hookify.*.local.md` (per-project)
+- **Global rules:** `~/.claude/hookify.*.local.md` (all projects)
+
+**Naming:** `hookify.{descriptive-name}.local.md`
 **Gitignore:** Add `.claude/*.local.md` to `.gitignore`
 
 **Good names:**
@@ -373,4 +377,10 @@ Warning message
 - Prompt: `user_prompt`
 
 **Operators:**
-- `regex_match`, `contains`, `equals`, `not_contains`, `starts_with`, `ends_with`
+- `regex_match`, `not_regex_match`, `contains`, `equals`, `not_contains`, `starts_with`, `ends_with`
+
+**hookify-plus extras:**
+- `not_regex_match` operator for exclusions
+- `value` key as alias for `pattern`
+- Global rules in `~/.claude/`
+- `read` event type for Read/Glob/Grep/LS
