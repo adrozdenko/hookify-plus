@@ -15,6 +15,8 @@ The upstream hookify plugin has several limitations and bugs. This fork includes
 | Global rules in `~/.claude/` | Missing | Included |
 | `Update` tool support | Missing | Included |
 | Write tool `new_text` field | Bug | Fixed |
+| Python 3.8 compatibility | Bug | Fixed |
+| Claude sees blocking reasons | Bug | Fixed |
 
 ## Installation
 
@@ -115,12 +117,14 @@ The `Update` tool is now recognized as a file event, matching `Edit`, `Write`, a
 
 These features have been submitted to upstream (pending review):
 
-| PR | Feature | Status |
-|----|---------|--------|
+| PR/Issue | Feature | Status |
+|----------|---------|--------|
 | [#18419](https://github.com/anthropics/claude-code/pull/18419) | `not_regex_match` + `value` key | Open |
 | [#18438](https://github.com/anthropics/claude-code/pull/18438) | `read` event type | Open |
 | [#13916](https://github.com/anthropics/claude-code/pull/13916) | Global rules in `~/.claude/` | Open |
 | [#16081](https://github.com/anthropics/claude-code/pull/16081) | Write tool fix + Update tool | Open |
+| [#14588](https://github.com/anthropics/claude-code/issues/14588) | Python 3.8 compatibility | Bug |
+| [#12446](https://github.com/anthropics/claude-code/issues/12446) | Claude sees blocking reasons | Bug |
 
 All integrated into hookify-plus. No waiting for upstream approval.
 

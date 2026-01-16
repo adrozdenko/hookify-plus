@@ -4,6 +4,8 @@
 Loads and parses .claude/hookify.*.local.md files.
 """
 
+from __future__ import annotations  # Python 3.8 compatibility (PEP 563)
+
 import os
 import sys
 import glob
