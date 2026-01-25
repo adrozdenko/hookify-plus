@@ -1,7 +1,7 @@
 {
   "name": "hookify-plus",
-  "version": "1.0.0",
-  "description": "Enhanced hookify with not_regex_match, value key, and read event support",
+  "version": "1.1.0",
+  "description": "Hookify with rate-limited warnings (warn_once, warn_interval) and stderr fix for #12446",
   "author": "adrozdenko",
   "repository": "https://github.com/adrozdenko/hookify-plus",
   "license": "MIT"
