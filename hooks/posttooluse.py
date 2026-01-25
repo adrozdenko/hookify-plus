@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""PostToolUse hook executor for hookify plugin.
+"""PostToolUse hook executor for hookify-plus.
 
-This script is called by Claude Code after a tool executes.
-It reads .claude/hookify.*.local.md files and evaluates rules.
+Evaluates warning rules after tool execution.
+Supports rate limiting via warn_once and warn_interval.
+Uses stderr + exit 2 to ensure messages reach Claude (fix for #12446).
 """
 
 import os
@@ -17,9 +18,9 @@ if PLUGIN_ROOT and PLUGIN_ROOT not in sys.path:
 try:
     from core.config_loader import load_rules
     from core.rule_engine import RuleEngine
+    from core.state import WarningState
 except ImportError as e:
-    error_msg = {"systemMessage": f"Hookify import error: {e}"}
-    print(json.dumps(error_msg), file=sys.stdout)
+    print(f"Hookify import error: {e}", file=sys.stderr)
     sys.exit(0)
 
 
@@ -29,35 +30,59 @@ def main():
         # Read input from stdin
         input_data = json.load(sys.stdin)
 
-        # Determine event type based on tool
-        # Map tools to event types to filter rules correctly
         tool_name = input_data.get('tool_name', '')
+        session_id = input_data.get('session_id', '')
+
+        # Map tools to event types
         event = None
         if tool_name == 'Bash':
             event = 'bash'
         elif tool_name in ['Edit', 'Write', 'MultiEdit', 'Update']:
             event = 'file'
         elif tool_name in ['Read', 'Glob', 'Grep', 'LS']:
-            event = 'read'  # Read operations get their own event type
+            event = 'read'
 
         # Load rules
         rules = load_rules(event=event)
 
-        # Evaluate rules
+        # Filter to only warning rules
+        warn_rules = [r for r in rules if r.action == 'warn']
+
+        if not warn_rules:
+            sys.exit(0)
+
+        # Initialize state for rate limiting
+        state = WarningState(session_id)
+
+        # Evaluate which rules match
         engine = RuleEngine()
-        result = engine.evaluate_rules(rules, input_data)
+        matching_rules = []
 
-        # Always output JSON (even if empty)
-        print(json.dumps(result), file=sys.stdout)
+        for rule in warn_rules:
+            # Check if rule matches
+            test_result = engine.evaluate_rules([rule], input_data)
+            if test_result.get('systemMessage'):
+                # Rule matched - check rate limit before adding to output
+                if state.should_warn(rule):
+                    matching_rules.append(rule)
+                # Always record match for rate limiting
+                state.record_match(rule)
 
+        if not matching_rules:
+            sys.exit(0)
+
+        # Build combined message
+        messages = [f"**[{r.name}]**\n{r.message}" for r in matching_rules]
+        combined_message = "\n\n".join(messages)
+
+        # Send to Claude via stderr + exit 2 (fix for #12446)
+        print(combined_message, file=sys.stderr)
+        sys.exit(2)
+
+    except json.JSONDecodeError:
+        sys.exit(0)  # Invalid input, allow operation
     except Exception as e:
-        error_output = {
-            "systemMessage": f"Hookify error: {str(e)}"
-        }
-        print(json.dumps(error_output), file=sys.stdout)
-
-    finally:
-        # ALWAYS exit 0
+        print(f"Hookify error: {str(e)}", file=sys.stderr)
         sys.exit(0)
 
 
