@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "hookify-plus-local",
-  "description": "Local hookify-plus with rate-limited warnings",
+  "name": "hookify-plus",
+  "description": "Hookify with rate-limited warnings and stderr fix",
   "owner": {
     "name": "anthony-spruyt",
     "email": "noreply@github.com"
@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "hookify-plus",
-      "description": "Hookify with rate-limited warnings (warn_once, warn_interval) and stderr fix",
+      "description": "Hookify with rate-limited warnings (warn_once, warn_interval) and stderr fix for #12446",
       "version": "1.1.0",
       "author": {
         "name": "adrozdenko",
