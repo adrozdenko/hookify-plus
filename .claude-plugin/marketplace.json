@@ -3,7 +3,7 @@
   "name": "hookify-plus",
   "description": "Hookify with rate-limited warnings and stderr fix",
   "owner": {
-    "name": "anthony-spruyt",
+    "name": "adrozdenko",
     "email": "noreply@github.com"
   },
   "plugins": [
