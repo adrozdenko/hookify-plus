@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""PreToolUse hook executor for hookify plugin.
+"""PreToolUse hook executor for hookify-plus.
 
-This script is called by Claude Code before any tool executes.
-It reads .claude/hookify.*.local.md files and evaluates rules.
+Evaluates blocking rules before tool execution.
+Resets warning state when a subagent is spawned (Task tool).
+Uses stderr + exit 2 to ensure messages reach Claude (fix for #12446).
 """
 
 import os
@@ -17,10 +18,10 @@ if PLUGIN_ROOT and PLUGIN_ROOT not in sys.path:
 try:
     from core.config_loader import load_rules
     from core.rule_engine import RuleEngine
+    from core.state import reset_warning_state
 except ImportError as e:
     # If imports fail, allow operation and log error
-    error_msg = {"systemMessage": f"Hookify import error: {e}"}
-    print(json.dumps(error_msg), file=sys.stdout)
+    print(f"Hookify import error: {e}", file=sys.stderr)
     sys.exit(0)
 
 
@@ -30,42 +31,60 @@ def main():
         # Read input from stdin
         input_data = json.load(sys.stdin)
 
-        # Determine event type for filtering
-        # For PreToolUse, we use tool_name to determine event category
         tool_name = input_data.get('tool_name', '')
+        session_id = input_data.get('session_id', '')
+
+        # Reset warning state when spawning a subagent
+        # This gives each subagent fresh warnings
+        if tool_name == 'Task':
+            reset_warning_state(session_id)
 
         # Map tools to event types
-        # - 'bash': Bash commands
-        # - 'file': File modifications (Edit, Write, MultiEdit)
-        # - 'read': File reads (Read, Glob, Grep) - should NOT trigger file rules
-        # - None: Other tools - only load 'all' rules
         event = None
         if tool_name == 'Bash':
             event = 'bash'
         elif tool_name in ['Edit', 'Write', 'MultiEdit', 'Update']:
             event = 'file'
         elif tool_name in ['Read', 'Glob', 'Grep', 'LS']:
-            event = 'read'  # Read operations get their own event type
+            event = 'read'
 
         # Load rules
         rules = load_rules(event=event)
 
+        # Filter to only blocking rules
+        block_rules = [r for r in rules if r.action == 'block']
+
+        if not block_rules:
+            sys.exit(0)  # No blocking rules, allow
+
         # Evaluate rules
         engine = RuleEngine()
-        result = engine.evaluate_rules(rules, input_data)
+        result = engine.evaluate_rules(block_rules, input_data)
 
-        # Always output JSON (even if empty)
-        print(json.dumps(result), file=sys.stdout)
+        # Check if any rule blocked
+        is_block = result.get('hookSpecificOutput', {}).get('permissionDecision') == 'deny'
 
+        if is_block:
+            message = result.get('systemMessage', 'Blocked by hookify rule')
+
+            # Show to user via /dev/tty (CLI)
+            try:
+                with open('/dev/tty', 'w') as tty:
+                    tty.write(f"\n🚫 BLOCKED: {message}\n")
+            except (OSError, IOError):
+                pass
+
+            # Send to Claude via stderr + exit 2 (fix for #12446)
+            print(message, file=sys.stderr)
+            sys.exit(2)
+
+        sys.exit(0)
+
+    except json.JSONDecodeError:
+        sys.exit(0)  # Invalid input, allow operation
     except Exception as e:
         # On any error, allow the operation and log
-        error_output = {
-            "systemMessage": f"Hookify error: {str(e)}"
-        }
-        print(json.dumps(error_output), file=sys.stdout)
-
-    finally:
-        # ALWAYS exit 0 - never block operations due to hook errors
+        print(f"Hookify error: {str(e)}", file=sys.stderr)
         sys.exit(0)
 
 

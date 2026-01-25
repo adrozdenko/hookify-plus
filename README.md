@@ -12,24 +12,24 @@ The upstream hookify plugin has bugs and missing features that Anthropic hasn't 
 
 ### 5 Features Added
 
-| Feature | What it does |
-|---------|--------------|
-| `not_regex_match` | Exclude patterns (e.g., skip test files from rules) |
-| `value` key | Clearer syntax for non-regex operators |
-| `read` event | Separate event for Read/Glob/Grep/LS (no false triggers) |
-| Global rules | Rules in `~/.claude/` apply to ALL projects |
-| `Update` tool | File events now fire for the Update tool |
+| Feature           | What it does                                             |
+| ----------------- | -------------------------------------------------------- |
+| `not_regex_match` | Exclude patterns (e.g., skip test files from rules)      |
+| `value` key       | Clearer syntax for non-regex operators                   |
+| `read` event      | Separate event for Read/Glob/Grep/LS (no false triggers) |
+| Global rules      | Rules in `~/.claude/` apply to ALL projects              |
+| `Update` tool     | File events now fire for the Update tool                 |
 
 ### 6 Bugs Fixed
 
-| Bug | Issue |
-|-----|-------|
+| Bug                                       | Issue                                                            |
+| ----------------------------------------- | ---------------------------------------------------------------- |
 | Read tools incorrectly fired `file` rules | [#14588](https://github.com/anthropics/claude-code/issues/14588) |
-| Write tool `new_text` field was broken | [#16081](https://github.com/anthropics/claude-code/pull/16081) |
-| Python 3.8 type hints incompatible | [#14588](https://github.com/anthropics/claude-code/issues/14588) |
-| Claude couldn't see why rules blocked | [#12446](https://github.com/anthropics/claude-code/issues/12446) |
-| Windows paths with spaces failed | [#16152](https://github.com/anthropics/claude-code/issues/16152) |
-| Example file used wrong operator | [#13464](https://github.com/anthropics/claude-code/issues/13464) |
+| Write tool `new_text` field was broken    | [#16081](https://github.com/anthropics/claude-code/pull/16081)   |
+| Python 3.8 type hints incompatible        | [#14588](https://github.com/anthropics/claude-code/issues/14588) |
+| Claude couldn't see why rules blocked     | [#12446](https://github.com/anthropics/claude-code/issues/12446) |
+| Windows paths with spaces failed          | [#16152](https://github.com/anthropics/claude-code/issues/16152) |
+| Example file used wrong operator          | [#13464](https://github.com/anthropics/claude-code/issues/13464) |
 
 **11 total improvements.** No waiting for Anthropic to merge PRs.
 
@@ -95,48 +95,47 @@ conditions:
     operator: not_regex_match
     pattern: \.example$
 ---
-
 You're editing a .env file. Make sure it's in .gitignore!
 ```
 
 ### Event Types
 
-| Event | Triggers On |
-|-------|-------------|
-| `bash` | Bash tool |
-| `file` | Edit, Write, MultiEdit, Update |
-| `read` | Read, Glob, Grep, LS |
-| `stop` | Agent completion |
-| `prompt` | User prompt submit |
-| `all` | All of the above |
+| Event    | Triggers On                    |
+| -------- | ------------------------------ |
+| `bash`   | Bash tool                      |
+| `file`   | Edit, Write, MultiEdit, Update |
+| `read`   | Read, Glob, Grep, LS           |
+| `stop`   | Agent completion               |
+| `prompt` | User prompt submit             |
+| `all`    | All of the above               |
 
 ### Operators
 
-| Operator | Description |
-|----------|-------------|
-| `regex_match` | Pattern matches (regex) |
-| `not_regex_match` | Pattern does NOT match |
-| `contains` | Substring present |
-| `not_contains` | Substring NOT present |
-| `equals` | Exact match |
-| `starts_with` | Prefix match |
-| `ends_with` | Suffix match |
+| Operator          | Description             |
+| ----------------- | ----------------------- |
+| `regex_match`     | Pattern matches (regex) |
+| `not_regex_match` | Pattern does NOT match  |
+| `contains`        | Substring present       |
+| `not_contains`    | Substring NOT present   |
+| `equals`          | Exact match             |
+| `starts_with`     | Prefix match            |
+| `ends_with`       | Suffix match            |
 
 ### Fields by Event
 
-| Event | Available Fields |
-|-------|------------------|
-| `bash` | `command` |
-| `file` | `file_path`, `new_text`, `old_text`, `content` |
-| `read` | `file_path` |
-| `stop` | `reason`, `transcript` |
-| `prompt` | `user_prompt` |
+| Event    | Available Fields                               |
+| -------- | ---------------------------------------------- |
+| `bash`   | `command`                                      |
+| `file`   | `file_path`, `new_text`, `old_text`, `content` |
+| `read`   | `file_path`                                    |
+| `stop`   | `reason`, `transcript`                         |
+| `prompt` | `user_prompt`                                  |
 
 ### Rule Locations
 
-| Location | Scope |
-|----------|-------|
-| `.claude/hookify.*.local.md` | Current project only |
+| Location                       | Scope                 |
+| ------------------------------ | --------------------- |
+| `.claude/hookify.*.local.md`   | Current project only  |
 | `~/.claude/hookify.*.local.md` | All projects (global) |
 
 ---
@@ -188,10 +187,10 @@ See [CHANGELOG.md](CHANGELOG.md) for full history.
 
 ## Credits
 
-| Contributor | Contribution |
-|-------------|--------------|
-| [@adrozdenko](https://github.com/adrozdenko) | Fork maintainer, `not_regex_match`, `value` key, `read` event |
-| [@kp222x](https://github.com/kp222x) | Global rules ([#13916](https://github.com/anthropics/claude-code/pull/13916)) |
+| Contributor                                    | Contribution                                                                             |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [@adrozdenko](https://github.com/adrozdenko)   | Fork maintainer, `not_regex_match`, `value` key, `read` event                            |
+| [@kp222x](https://github.com/kp222x)           | Global rules ([#13916](https://github.com/anthropics/claude-code/pull/13916))            |
 | [@heathdutton](https://github.com/heathdutton) | Write fix + Update tool ([#16081](https://github.com/anthropics/claude-code/pull/16081)) |
 
 ## Contributing
