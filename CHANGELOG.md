@@ -4,6 +4,23 @@ All notable changes to hookify-plus are documented here.
 
 Based on upstream [hookify 0.1.0](https://github.com/anthropics/claude-code/tree/main/plugins/hookify).
 
+## [0.1.0-plus.4] - 2026-01-25
+
+### Added
+
+- **Rate limiting for warnings** - New `warn_once` and `warn_interval` fields reduce context waste
+  - `warn_once: true` - Only warn once per agent session
+  - `warn_interval: N` - Warn every N matches
+- **State management** - PPID-scoped state in `/tmp/` with 24h TTL
+  - Main agent and subagents have independent warning state
+  - Auto-cleanup of stale state files
+
+### Fixed
+
+- **Proper #12446 fix** - Messages now use stderr + exit 2 instead of stdout + exit 0
+  - Previous fix only added `permissionDecisionReason` which didn't work
+  - Now Claude actually sees block/warn messages
+
 ## [0.1.0-plus.3] - 2025-01-16
 
 ### Fixed
